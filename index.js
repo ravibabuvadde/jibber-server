@@ -27,12 +27,7 @@ io.on("connection", (socket) => {
     if (availablePersons.length === 0) {
       availablePersons.push({ id: socket.id });
     } else {
-      // find person id from availablePersons
-      const person = availablePersons.find((person) => person.id !== socket.id);
-      if (!person) {
-        availablePersons.push({ id: socket.id });
-        return;
-      }
+      const person = availablePersons.pop(0);
 
       socket.to(person.id).emit("match", { id: socket.id });
       socket.emit("match", { id: person.id });
