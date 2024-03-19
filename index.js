@@ -71,6 +71,11 @@ io.on("connection", (socket) => {
     socket.emit("skipChat");
   });
 
+  socket.on("deleteImage", (msg) => {
+    io.to(msg.to).emit("deleteImage", msg);
+    socket.emit("deleteImage", msg);
+  });
+
   socket.on("disconnect", () => {
     // console.log("user disconnected");
     // console.log(availablePersons);
