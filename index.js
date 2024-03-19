@@ -15,7 +15,8 @@ const io = new Server(server, {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.get("/", (req, res) => {
-  res.send("Hello");
+  // current full count of connected sockets
+  res.send("Current Active Users " + io.engine.clientsCount);
 });
 
 const availablePersons = [];
@@ -33,9 +34,9 @@ io.on("connection", (socket) => {
       socket.emit("match", { id: person.id });
       matchedPersons.push({ id1: socket.id, id2: person.id });
     }
-    console.log(socket.id + " joined");
-    console.log(availablePersons);
-    console.log(matchedPersons);
+    // console.log(socket.id + " joined");
+    // console.log(availablePersons);
+    // console.log(matchedPersons);
   });
 
   socket.on("message", (msg) => {
@@ -71,7 +72,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    // console.log("user disconnected");
     // console.log(availablePersons);
 
     availablePersons.forEach((person, index) => {
