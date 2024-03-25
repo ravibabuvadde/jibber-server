@@ -96,20 +96,18 @@ io.on("connection", (socket) => {
       }
     });
 
-    matchedPersons.forEach((person) => {
-      if (person.id1 === socket.id) {
-        // availablePersons.push({ id: person.id2 });
-
-        socket.to(person.id2).emit("disconnected");
-      } else if (person.id2 === socket.id) {
-        // availablePersons.push({ id: person.id1 });
-        socket.to(person.id1).emit("disconnected");
-      }
-    });
+    matchedPersons.forEach((person) => {});
 
     // delete matchedPersons where id1 or id2 is socket.id
     matchedPersons.forEach((person, index) => {
-      if (person.id1 === socket.id || person.id2 === socket.id) {
+      if (person.id1 === socket.id) {
+        // availablePersons.push({ id: person.id2 });
+        matchedPersons.splice(index, 1);
+
+        socket.to(person.id2).emit("endChat");
+      } else if (person.id2 === socket.id) {
+        // availablePersons.push({ id: person.id1 });
+        socket.to(person.id1).emit("endChat");
         matchedPersons.splice(index, 1);
       }
     });
