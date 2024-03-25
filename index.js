@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { Server } from "socket.io";
+import { v4 } from "uuid";
 
 const app = express();
 const server = createServer(app);
@@ -40,7 +41,16 @@ io.on("connection", (socket) => {
   });
 
   socket.on("message", (msg) => {
-    io.to(msg.to).emit("message", msg);
+    const message = {
+      id: v4(),
+      sender_id: socket.id,
+      message: msg.message,
+      to: msg.to,
+      datatype: msg.datatype,
+      deleted: false,
+    };
+    io.to(msg.to).emit("message", message);
+    socket.emit("message", message);
     // console.log(msg);
   });
 
@@ -49,15 +59,15 @@ io.on("connection", (socket) => {
     // console.log(msg);
   });
 
-  socket.on("skipChat", (msg) => {
+  socket.on("endChat", (msg) => {
     matchedPersons.forEach((person) => {
       if (person.id1 === socket.id) {
         // availablePersons.push({ id: person.id2 });
 
-        socket.to(person.id2).emit("disconnected");
+        socket.to(person.id2).emit("endChat");
       } else if (person.id2 === socket.id) {
         // availablePersons.push({ id: person.id1 });
-        socket.to(person.id1).emit("disconnected");
+        socket.to(person.id1).emit("endChat");
       }
     });
 
@@ -68,12 +78,12 @@ io.on("connection", (socket) => {
       }
     });
 
-    socket.emit("skipChat");
+    socket.emit("endChat");
   });
 
-  socket.on("deleteImage", (msg) => {
-    io.to(msg.to).emit("deleteImage", msg);
-    socket.emit("deleteImage", msg);
+  socket.on("deleteMessage", (msg) => {
+    io.to(msg.to).emit("deleteMessage", msg);
+    socket.emit("deleteMessage", msg);
   });
 
   socket.on("disconnect", () => {
